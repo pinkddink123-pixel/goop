@@ -3,15 +3,17 @@ const axios = require("axios");
 const cors = require("cors");
 
 const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-// Root route so Railway sees the service as alive
+// Health check (optional but very helpful)
 app.get("/", (req, res) => {
-    res.send("DNB API is running");
+    res.json({ status: "ok" });
 });
 
-// Main card balance route
+// Main endpoint
 app.post("/checkcard", async (req, res) => {
     try {
         const { card_number, pin } = req.body;
@@ -22,10 +24,9 @@ app.post("/checkcard", async (req, res) => {
             });
         }
 
-        // JSON body (this is correct for D&B)
         const jsonBody = {
-            card_number: card_number,
-            pin: pin
+            card_number,
+            pin
         };
 
         const response = await axios.post(
@@ -33,7 +34,7 @@ app.post("/checkcard", async (req, res) => {
             jsonBody,
             {
                 headers: {
-                    "Content-Type": "application/xml",
+                    "Content-Type": "application/xml", // yes, this is intentional
                     "Accept": "*/*",
                     "Origin": "https://www.daveandbusters.com",
                     "Referer": "https://www.daveandbusters.com/us/en/power-up/power-cards",
@@ -54,9 +55,9 @@ app.post("/checkcard", async (req, res) => {
     }
 });
 
-// Dynamic port for Railway + fallback port 3000 for local dev
-const PORT = process.env.PORT || 3000;
+// 🚨 THIS IS THE CRITICAL FIX 🚨
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
+    console.log(`Server running on port ${PORT}`);
 });
