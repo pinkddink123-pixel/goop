@@ -16,19 +16,17 @@ app.post("/checkcard", async (req, res) => {
             });
         }
 
-        // BODY MUST BE JSON (not XML)
         const jsonBody = {
             card_number: card_number,
             pin: pin
         };
 
-        // Send JSON body with XML header (yes, this is correct)
         const response = await axios.post(
             "https://www.daveandbusters.com/content/dnb-request/datadetails.json?mode=cardBalance",
             jsonBody,
             {
                 headers: {
-                    "Content-Type": "application/xml",     // D&B expects this fake header
+                    "Content-Type": "application/xml",
                     "Accept": "*/*",
                     "Origin": "https://www.daveandbusters.com",
                     "Referer": "https://www.daveandbusters.com/us/en/power-up/power-cards",
@@ -49,6 +47,8 @@ app.post("/checkcard", async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log("Server running on port " + PORT);
 });
